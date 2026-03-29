@@ -1,7 +1,7 @@
 #用 RFM 模型对用户分层：
 #- R（Recency）：最近一次购买距今多少天，越近越好
 import pandas as pd
-df = pd.read_csv(r'D:\LI YUTONG\Documents\python projects\文件夹\数据分析项目\数据集\项目3数据集\OnlineRetail.csv')
+df = pd.read_csv(r'D:\LI YUTONG\Documents\python projects\文件夹\数据分析项目\数据集\项目3数据集\OnlineRetail.csv',encoding ='gbk')
 print(df.info())
 print(df.isnull().sum())#查看原数据缺失情况
 df = df.dropna(subset=['CustomerID'])#去除ID为空的行

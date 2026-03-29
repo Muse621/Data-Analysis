@@ -1,6 +1,6 @@
 #输出每个用户的 RFM 得分，将用户分为"高价值""流失风险""新客户"等类别
 import pandas as pd
-df = pd.read_csv(r'D:\LI YUTONG\Documents\python projects\文件夹\数据分析项目\数据集\项目3数据集\OnlineRetail.csv')
+df = pd.read_csv(r'D:\LI YUTONG\Documents\python projects\文件夹\数据分析项目\数据集\项目3数据集\OnlineRetail.csv',encoding ='gbk')
 print(df.info())
 print(df.isnull().sum())
 df = df.dropna(subset=['CustomerID'])
