@@ -48,23 +48,44 @@ else:
 
 
 # 5. A/B 检验（分别传入两组人数！）
-conv_result = df.groupby('group')['converted'].sum()
-conv_control = conv_result['control']
-conv_treat   = conv_result['treatment']
+control = df[df['group']=='control']['converted']
+treatment = df[df['group']=='treatment']['converted']
+n_control = len(control)
+n_treatment = len(treatment)
+conv_control = control.sum()
+conv_treatment = treatment.sum()
+p_control = conv_control / n_control
+p_treatment = conv_treatment / n_treatment
 
+
+# 双样本比例 z 检验
 z_stat, p_value = proportions_ztest(
-    [conv_control, conv_treat], # [conv_control, conv_treat]转换成功的人数
+    [conv_control, conv_treatment], # [conv_control, conv_treat]转换成功的人数
     [n_control,   n_treat]
 ) # p_value为核心结果
 
 
+# 95% 置信区间
+diff = p_treatment - p_control
+se = np.sqrt(p_treatment*(1-p_treatment)/n_treatment + p_control*(1-p_control)/n_control)
+ci_lower = diff - 1.96 * se
+ci_upper = diff + 1.96 * se
+
+
 #输出检验结果
 print("\n=== A/B 检验结果 ===")
-print(f"p值 = {p_value:.4f}") #.4f 保留4位小数 #.2f 保留2位小数 #.of 输出为整数
+print(f"对照组转化率：{p_control:.4f} ({p_control*100:.2f}%)")
+print(f"实验组转化率：{p_treatment:.4f} ({p_treatment*100:.2f}%)")
+print(f"提升幅度：{diff*100:.2f} 个百分点（相对提升 {diff/p_control*100:.1f}%）")
+print(f"Z 统计量：{z_stat:.4f}")
+print(f"p 值：{p_value:.4f}")#.4f 保留4位小数 #.2f 保留2位小数 #.of 输出为整数
+print(f"95% 置信区间：[{ci_lower*100:.2f}%, {ci_upper*100:.2f}%]")
+print()
 if p_value < 0.05:
-    print("✅ 显著！新版本更好")
+    print("结论：差异显著（p<0.05），实验组效果更好")
 else:
-    print("⚠️ 不显著，不能下结论")
+    print("结论：差异不显著（p≥0.05），暂不建议上线")
+
 
 
 #统计结论部分:实验组转化率为0.118920（11.8920%），对照组转化率为0.120399（12.0399%），二者差异仅为**-0.001479**（-0.1479个百分点），无正向提升；p值 = 0.2161，远大于显著性水平0.05，差异统计不显著。同时，当前每组样本量（147202/147276）远低于所需样本量（755339），样本量严重不足，导致统计效力不足，无法可靠识别真实差异。
