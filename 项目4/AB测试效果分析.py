@@ -80,7 +80,7 @@ print(f"对照组转化率：{p_control:.4f} ({p_control*100:.2f}%)")
 print(f"实验组转化率：{p_treatment:.4f} ({p_treatment*100:.2f}%)")
 print(f"提升幅度：{diff*100:.2f} 个百分点（相对提升 {diff/p_control*100:.1f}%）")
 print(f"Z 统计量：{z_stat:.4f}")
-print(f"p 值：{p_value:.4f}")#.4f 保留4位小数 #.2f 保留2位小数 #.of 输出为整数
+print(f"p 值：{p_value:.4f}")#.4f 保留4位小数 #.2f 保留2位小数 #.0f 输出为整数
 print(f"95% 置信区间：[{ci_lower*100:.2f}%, {ci_upper*100:.2f}%]")
 print()
 if p_value < 0.05:
