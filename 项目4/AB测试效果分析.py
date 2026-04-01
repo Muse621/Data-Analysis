@@ -48,28 +48,30 @@ else:
 
 
 # 5. A/B 检验（分别传入两组人数！）
-control = df[df['group']=='control']['converted']
+control = df[df['group']=='control']['converted'] #==判断相等 #筛选出control组提取它的converted列，得到一个series
 treatment = df[df['group']=='treatment']['converted']
-n_control = len(control)
+n_control = len(control) #len()计算series里元素的个数
 n_treatment = len(treatment)
-conv_control = control.sum()
+conv_control = control.sum() #计算series里元素的和
 conv_treatment = treatment.sum()
-p_control = conv_control / n_control
+p_control = conv_control / n_control #转化率=转化和/转化人数
 p_treatment = conv_treatment / n_treatment
 
 
 # 双样本比例 z 检验
 z_stat, p_value = proportions_ztest(
-    [conv_control, conv_treatment], # [conv_control, conv_treat]转换成功的人数
+    [conv_control, conv_treatment],
     [n_control,   n_treat]
 ) # p_value为核心结果
+ #- 若 p_value < 0.05 （常用显著性水平\alpha=0.05），则认为两组转化率存在统计学显著差异，实验组的效果不是随机波动导致的；
+ #- 若 p_value ≥ 0.05 ，则无法拒绝原假设，认为两组无显著差异。
 
 
 # 95% 置信区间
-diff = p_treatment - p_control
-se = np.sqrt(p_treatment*(1-p_treatment)/n_treatment + p_control*(1-p_control)/n_control)
-ci_lower = diff - 1.96 * se
-ci_upper = diff + 1.96 * se
+diff = p_treatment - p_control #转化率之差
+se = np.sqrt(p_treatment*(1-p_treatment)/n_treatment + p_control*(1-p_control)/n_control)#计算差值的标准误（Standard Error, SE），衡量差值的抽样波动程度。
+ci_lower = diff - 1.96 * se #计算下限
+ci_upper = diff + 1.96 * se #计算上限
 
 
 #输出检验结果
