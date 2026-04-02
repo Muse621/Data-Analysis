@@ -3,12 +3,17 @@
 #statsmodels库 
 import pandas as pd
 import numpy as np
+import matplotlib.pyplot as plt
+# 全局配置：解决中文乱码+负号显示异常（Windows/Mac/Linux通用）
+plt.rcParams['font.sans-serif'] = ['SimHei', 'WenQuanYi Zen Hei', 'Arial Unicode MS']
+plt.rcParams['axes.unicode_minus'] = False
+plt.rcParams['figure.dpi'] = 150  # 统一图片清晰度
 from statsmodels.stats.power import NormalIndPower #.stats.power统计检验能力 #NormalIndPower样本量计算工具
 from statsmodels.stats.proportion import proportions_ztest #.stats.proportion比例转化率模块 #proportions_ztest检验AB转化率
 
 
 #调取数据
-df = pd.read_csv(r'D:\LI YUTONG\Documents\python projects\文件夹\数据分析项目\数据集\项目5数据集\ab_data.csv',encoding = 'utf-8')
+df = pd.read_csv(r'D:\LI YUTONG\Documents\python projects\文件夹\数据分析项目\数据集\项目4数据集\ab_data1.csv',encoding = 'utf-8')
 # 看两组各多少人、转化率多少
 result = df.groupby('group')['converted'].agg(['count','mean'])#按组查看人数和转化率，由于converted只有01，求均值就是转化率
 print("当前数据情况")
@@ -87,6 +92,71 @@ if p_value < 0.05:
     print("结论：差异显著（p<0.05），实验组效果更好")
 else:
     print("结论：差异不显著（p≥0.05），暂不建议上线")
+
+
+
+#**图一：两组转化率对比（带误差棒）**
+
+fig, ax = plt.subplots(figsize=(7, 5))#创建一个画布 (fig) 和坐标轴 (ax)，figsize设置图表尺寸为宽7英寸、高5英寸
+groups = ['对照组', '实验组'] #x轴
+rates = [p_control, p_treatment] #y轴
+errors = [1.96 * np.sqrt(p*(1-p)/n) for p, n in [(p_control, n_control), (p_treatment, n_treatment)]]
+#二项分布的 95% 置信区间，用于计算转化率的误差范围。
+colors = ['#8ca8d8', '#1a3a6b']
+bars = ax.bar(groups, [r*100 for r in rates], color=colors,#ax.bar(...)：绘制柱状图 #把小数转化率转成百分比
+              yerr=[e*100 for e in errors], capsize=6, width=0.5,#误差棒，y轴方向的误差范围，同样转成百分比
+              #误差棒两端的横线长度6，让误差棒更清晰 #误差棒柱子的宽度0.5
+              error_kw={'linewidth': 2})#设置误差棒的线宽为2
+ax.set_ylabel('转化率（%）') #设置y轴标签
+ax.set_title('A/B 实验转化率对比') #设置图表标题
+for bar, rate in zip(bars, rates): #给每个柱子添加数值标注
+    ax.text(bar.get_x() + bar.get_width()/2, #计算柱子的中心 x 坐标
+            bar.get_height() + 0.3, #在柱子顶部上方 0.3 的位置标注
+            f'{rate*100:.2f}%', ha='center', fontsize=11, fontweight='bold')
+    #格式化转化率为保留 2 位小数的百分比 #水平居中对齐 #设置字体大小和加粗
+ax.set_ylim(0, max(rates)*100 * 1.3) #设置 y 轴范围，从 0 到最高转化率的 1.3 倍，给标注留出空间，避免顶格
+plt.tight_layout() #自动调整图表布局，避免标签、标题被截断
+plt.savefig('ab_comparison.png', dpi=150) #把图表保存为ab_comparison.png图片，dpi=150设置分辨率为 150，保证图片清晰
+
+
+
+#**图二：置信区间可视化**
+fig, ax = plt.subplots(figsize=(8, 3))#创建一个画布 (fig) 和坐标轴 (ax)，figsize设置图表尺寸为宽8英寸、高3英寸
+ax.axvline(x=0, color='red', linestyle='--', linewidth=1.5, label='零差异线')
+#画一条红色垂直(axvline)虚线(linestyle)，在 x 轴 0 的位置，linewidth=1.5：线条粗细，label='零差异线'：图例显示 “零差异线”
+# 如果置信区间跨过这条红线（包含 0） → 两组无显著差异（p>0.05）
+#如果置信区间完全在红线右侧 / 左侧 → 两组有显著差异
+ax.plot([ci_lower*100, ci_upper*100], [0, 0], 'b-', linewidth=3)
+#.plot折线图 #[ci_lower*100, ci_upper*100]置信区间下限 → 上限（×100 变成百分比）  #[0,0]：画在 y=0 的位置  #b-：蓝色实线  #linewidth=3：粗一点
+ax.plot(diff*100, 0, 'bo', markersize=10, label=f'点估计 {diff*100:.2f}%')
+#diff*100：实验组 - 对照组的转化率差异（百分比） #0：画在 y=0 #bo：画一个蓝色圆点 #markersize=10：圆点大小 #label：图例显示 “点估计 xx%
+ax.fill_betweenx([-0.5, 0.5], ci_lower*100, ci_upper*100, alpha=0.15, color='blue')
+#fill_between上下填色  #fill_betweenx左右填色 #alpha=0.15：透明度
+ax.set_xlabel('实验组相对对照组的转化率提升（百分点）')#x轴标题
+ax.set_title('95% 置信区间')#图表标题
+ax.set_yticks([])#隐藏 y 轴刻度
+ax.legend()#显示图例
+plt.tight_layout()#自动调整布局，避免标签被截断
+plt.savefig('ci_plot.png', dpi=150)#保存图片,分辨率150dpi
+plt.show()#展示图表
+
+
+
+### 第六步：导出结果到 Power BI
+
+summary = pd.DataFrame({
+    '组别': ['对照组', '实验组'],
+    '用户数': [n_control, n_treatment],
+    '转化人数': [conv_control, conv_treatment],
+    '转化率': [round(p_control*100, 2), round(p_treatment*100, 2)],
+    '95%置信区间下限': [round((p_control - 1.96*np.sqrt(p_control*(1-p_control)/n_control))*100, 2),
+                      round((p_treatment - 1.96*np.sqrt(p_treatment*(1-p_treatment)/n_treatment))*100, 2)],
+    '95%置信区间上限': [round((p_control + 1.96*np.sqrt(p_control*(1-p_control)/n_control))*100, 2),
+                      round((p_treatment + 1.96*np.sqrt(p_treatment*(1-p_treatment)/n_treatment))*100, 2)]
+})
+# utf-8-sig 解决 Power BI 读中文乱码
+summary.to_csv('ab_result.csv', index=False, encoding='utf-8-sig')#dateframe转换为csv
+print("已导出，在 Power BI 里导入 ab_result.csv")
 
 
 
