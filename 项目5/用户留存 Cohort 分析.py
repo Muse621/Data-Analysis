@@ -58,7 +58,7 @@ cohort_data = pd.read_sql("""
     ) b ON a.CohortMonth = b.CohortMonth
     ORDER BY a.CohortMonth, a.MonthIndex
 """, engine)
-print(cohort_data.head(20))
+print(cohort_data.head(10))
 
 #把 cohort_data 写入 SQL，生成新表 cohort_result
 cohort_data.to_sql(
@@ -89,7 +89,7 @@ pivot = cohort_data.pivot_table(
 print("MonthIndex=0 的留存率：")
 print(pivot[0])
 
-fig, ax = plt.subplots(figsize=(16,10))
+fig, ax = plt.subplots(figsize=(10,4))
 sns.heatmap(
     pivot,
     annot=True,
