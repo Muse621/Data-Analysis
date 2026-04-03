@@ -23,7 +23,7 @@ df = df[~df['InvoiceNo'].astype(str).str.startswith('C')] # ~ 代表取反 # 转
 print(f"清洗后：{len(df)} 条") 
 
 #导入SQL
-df.to_sql('orders', engine, if_exists='append', index=False, chunksize=5000)
+df.to_sql('orders', engine, if_exists='replace', index=False, chunksize=5000, method = 'multi') 
 #if_exists='append'如果表里已经有数据了，就在后面接着加，不删掉原来的
 #index=False不要把 pandas 自动生成的行号存进去，让数据库表干净一点
 #chunksize=5000一次存 5000 行，分批存，防止一次性存太多卡住
@@ -58,7 +58,7 @@ cohort_data = pd.read_sql("""
     ) b ON a.CohortMonth = b.CohortMonth
     ORDER BY a.CohortMonth, a.MonthIndex
 """, engine)
-print(cohort_data.head(10))
+print(cohort_data.head(20))
 
 #把 cohort_data 写入 SQL，生成新表 cohort_result
 cohort_data.to_sql(
