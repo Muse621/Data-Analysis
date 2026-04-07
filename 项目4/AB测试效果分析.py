@@ -13,7 +13,7 @@ from statsmodels.stats.proportion import proportions_ztest #.stats.proportion比
 
 
 #调取数据
-df = pd.read_csv(r'D:\LI YUTONG\Documents\python projects\文件夹\数据分析项目\数据集\项目4数据集\ab_data1.csv',encoding = 'utf-8')
+df = pd.read_csv(r'D:\LI YUTONG\Documents\python projects\文件夹\数据分析项目\数据集\项目4数据集\ab_data.csv',encoding = 'gbk')
 # 看两组各多少人、转化率多少
 result = df.groupby('group')['converted'].agg(['count','mean'])#按组查看人数和转化率，由于converted只有01，求均值就是转化率
 print("当前数据情况")
