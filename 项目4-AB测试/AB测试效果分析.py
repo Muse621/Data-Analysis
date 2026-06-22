@@ -14,16 +14,26 @@ from statsmodels.stats.proportion import proportions_ztest #.stats.proportion比
 
 #调取数据
 df = pd.read_csv(r'D:\LI YUTONG\Documents\python projects\文件夹\数据分析项目\数据集\项目4数据集\ab_data.csv',encoding = 'gbk')
+
+# ---------- 清洗：只保留匹配的行 ----------
+df = df[
+    ((df["group"] == "control") & (df["landing_page"] == "old_page")) |
+    ((df["group"] == "treatment") & (df["landing_page"] == "new_page"))
+]
+
+# ---------- 去重：一个用户只算一次 ----------
+df = df.drop_duplicates(subset="user_id")
+
 # 看两组各多少人、转化率多少
 result = df.groupby('group')['converted'].agg(['count','mean'])#按组查看人数和转化率，由于converted只有01，求均值就是转化率
 print("当前数据情况")
 print(result)#对照组147202，转化率12.04%   # 实验组147276，转化率11.89%
 
 
-n_control = result['count'].iloc[0]  #取对照组人数赋值给n
-n_treat = result['count'].iloc[1]  #取实验组人数赋值给m
-p_control = result.loc['control', 'mean']   # 取对照组实际转化率赋值给p1
-p_treat = result.loc['treatment', 'mean'] # 取实验组实际转化率赋值给p2
+n_control = result['count'].iloc[0]  #取对照组人数赋值
+n_treat = result['count'].iloc[1]  #取实验组人数赋值
+p_control = result.loc['control', 'mean']   # 取对照组实际转化率赋值
+p_treat = result.loc['treatment', 'mean'] # 取实验组实际转化率赋值
 # iloc[行号，列号] ,iloc[]取整行  # loc[行名，列名]
 
 
