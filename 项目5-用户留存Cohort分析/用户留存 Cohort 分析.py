@@ -8,7 +8,7 @@ from sqlalchemy import create_engine #连接sql数据库引擎
 engine = create_engine('mysql+pymysql://root:ym1478523690@localhost:3306/retail_db?charset=utf8mb4')
 
 #查看数据
-df = pd.read_csv(r'D:\LI YUTONG\Documents\python projects\文件夹\数据分析项目\数据集\项目5数据集\data.csv', encoding='gbk')
+df = pd.read_csv(r'D:\LI YUTONG\Documents\My Projects\Data-Analysis\数据集\项目5数据集\data.csv', encoding='gbk')
 print(df.info())
 print(f"退货订单: {df['InvoiceNo'].astype(str).str.startswith('C').sum()} 条")
 print(f"原始数据：{len(df)} 条") #len统计总条数

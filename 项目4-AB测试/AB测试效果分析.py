@@ -13,7 +13,7 @@ from statsmodels.stats.proportion import proportions_ztest #.stats.proportion比
 
 
 #调取数据
-df = pd.read_csv(r'D:\LI YUTONG\Documents\python projects\文件夹\数据分析项目\数据集\项目4数据集\ab_data.csv',encoding = 'gbk')
+df = pd.read_csv(r'D:\LI YUTONG\Documents\My Projects\Data-Analysis\数据集\项目4数据集\ab_data.csv',encoding = 'gbk')
 
 # ---------- 清洗：只保留匹配的行 ----------
 df = df[

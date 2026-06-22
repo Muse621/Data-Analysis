@@ -11,7 +11,7 @@ plt.rcParams['axes.unicode_minus'] = False
 plt.rcParams['figure.dpi'] = 150  # 统一图片清晰度
 engine = create_engine('mysql+pymysql://root:ym1478523690@localhost:3306/house_analysis?charset=utf8mb4')
 
-df = pd.read_csv(r'D:\LI YUTONG\Documents\python projects\文件夹\数据分析项目\数据集\项目6数据集\new.csv', encoding='gbk')
+df = pd.read_csv(r'D:\LI YUTONG\Documents\My Projects\Data-Analysis\数据集\项目6数据集\new.csv', encoding='gbk')
 print(df.info())
 print(f"原始数据：{len(df)}条")
 print(f"缺失条数：{df.isnull().sum()}条")
